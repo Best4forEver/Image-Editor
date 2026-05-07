@@ -9,16 +9,11 @@ from tkinter import messagebox
 
 file_path = None  
 saved = 0
-def on_close(editor):
-    global saved
-    if saved > 0:
+def on_close():
+    answer = messagebox.askyesno("Warning", "You haven't saved the file.The progress will be lost.")
+    if answer:
         editor.destroy()
         root.destroy()
-    else:
-        answer = messagebox.askyesno("Warning", "You haven't saved the file. The progress will be lost.\nAre you sure you want to exit?")
-        if answer:
-            editor.destroy()
-            root.destroy()
 
 def save(image):
  
@@ -31,7 +26,7 @@ def save(image):
     if save_path:
         image.save(save_path)
         global saved
-        saved = saved + 1
+        saved += 1
 
 def selection():
     global file_path 
@@ -45,8 +40,6 @@ def selection():
         open_editor(file_path) 
 
 def open_editor(filepath):
-    global saved
-    saved = 1  
     root.withdraw()  
 
     editor = tk.Toplevel(root)
@@ -55,7 +48,7 @@ def open_editor(filepath):
     editor.geometry("1280x720")
 
     tk.Label(editor, text=f"Editing: {filepath}", fg="gray").pack(pady=10)
-    
+
     def go_back():
         editor.destroy()
         root.deiconify()  
@@ -89,9 +82,8 @@ def open_editor(filepath):
     image_label = tk.Label(canvas_frame, image=photo, bg="#2E131E")
     image_label.image = photo
     image_label.pack(pady=10)
-    
-    editor.protocol("WM_DELETE_WINDOW", lambda: on_close(editor))
-        
+    if saved == 0:
+        editor.protocol("WM_DELETE_WINDOW", on_close)
     brightness  = tk.DoubleVar(value=1.0)
     contrast    = tk.DoubleVar(value=1.0)
     sharpness   = tk.DoubleVar(value=1.0)
@@ -120,8 +112,6 @@ def open_editor(filepath):
                  resolution=0.1, orient=tk.HORIZONTAL, bg="#1A1A2E", fg="white",
                  troughcolor="#132E23", command=update_image).pack(fill=tk.X, padx=10) 
     def update_image(val=None):
-        global saved
-        saved = 0
         nonlocal result
         result = original.copy()
         result = Image_Editor.Crop(result,

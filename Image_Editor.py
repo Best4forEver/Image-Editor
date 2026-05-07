@@ -1,5 +1,5 @@
 import os, sys
-from PIL import Image, ImageFilter, ImageFont, ImageEnhance, ImageDraw, ImageOps
+from PIL import Image, ImageFilter, ImageFont, ImageEnhance, ImageDraw, ImageOps,ImageTk
 #FILTERS
 
 def Blur(image, amount):
