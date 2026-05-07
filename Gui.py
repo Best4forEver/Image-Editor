@@ -5,10 +5,18 @@ from PIL import Image, ImageFilter, ImageFont, ImageEnhance, ImageDraw, ImageOps
 import tkinter as tk
 from tkinter import filedialog  
 from tkinter import ttk
+from tkinter import messagebox
 
 file_path = None  
+saved = 0
+def on_close():
+    answer = messagebox.askyesno("Warning", "You haven't saved the file.The progress will be lost.")
+    if answer:
+        editor.destroy()
+        root.destroy()
 
 def save(image):
+ 
     save_path = filedialog.asksaveasfilename(
     title="Save Image",
     defaultextension=".jpg",
@@ -17,6 +25,9 @@ def save(image):
 
     if save_path:
         image.save(save_path)
+        global saved
+        saved += 1
+
 def selection():
     global file_path 
     file_path = filedialog.askopenfilename(  
@@ -71,8 +82,8 @@ def open_editor(filepath):
     image_label = tk.Label(canvas_frame, image=photo, bg="#2E131E")
     image_label.image = photo
     image_label.pack(pady=10)
-
-    
+    if saved == 0:
+        editor.protocol("WM_DELETE_WINDOW", on_close)
     brightness  = tk.DoubleVar(value=1.0)
     contrast    = tk.DoubleVar(value=1.0)
     sharpness   = tk.DoubleVar(value=1.0)
@@ -156,6 +167,7 @@ def open_editor(filepath):
     # ----------------------------------
     exit_btn2 = tk.Button(bottom_panel, text="Exit", font=("Arial", 9), bg="#1A1A2E", fg="white", command=go_back)
     exit_btn2.pack(pady=10)
+    
 def exit_app():
     root.destroy()
     
