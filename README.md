@@ -1,0 +1,113 @@
+# 🖼️ Image X — Simple Image Editor
+
+A lightweight desktop image editor built with **Python**, **Tkinter**, and **Pillow (PIL)**. Open any photo and apply real-time adjustments using intuitive sliders — no installation beyond Python required.
+
+---
+
+## ✨ Features
+
+| Feature | Description |
+|---|---|
+| 🔆 **Brightness** | Lighten or darken your image (0.1× – 3.0×) |
+| 🎨 **Contrast** | Boost or reduce contrast (0.1× – 3.0×) |
+| ✏️ **Sharpness** | Make details crisp or soft (0.1× – 3.0×) |
+| 🌫️ **Blur** | Apply Gaussian blur (0 – 10 radius) |
+| 🔄 **Rotate** | Rotate the image 0–360 degrees |
+| 🔍 **Zoom** | Zoom into the center of the image |
+| ✂️ **Crop** | Interactively crop by Left / Top / Right / Bottom (collapsible panel) |
+| 💾 **Save** | Export edited image as `.jpg` or `.png` |
+| ⚠️ **Unsaved warning** | Prompts before closing if image hasn't been saved |
+
+---
+
+## 📁 Project Structure
+
+```
+Simple Image Editor/
+│
+├── Gui.py              # Main application — Tkinter GUI and editor window
+├── Image_Editor.py     # Backend image processing functions (Pillow)
+├── logo.ico            # App icon
+└── README.md
+```
+
+### `Gui.py`
+Handles the entire UI:
+- **Home screen** — Import Photo button and Exit.
+- **Editor window** — Opens on image selection; contains:
+  - Left panel: Brightness, Contrast, Sharpness, Blur sliders.
+  - Right panel: Rotate, Zoom sliders + collapsible Crop section.
+  - Canvas: Live image preview that updates with every slider change.
+  - Bottom bar: Save and Go Back buttons.
+
+### `Image_Editor.py`
+Pure image processing module — every function takes a PIL `Image` and returns a modified `Image`:
+
+| Function | What it does |
+|---|---|
+| `Blur(image, amount)` | Gaussian blur with given radius |
+| `Sharpness(image, amount)` | Sharpness enhancement |
+| `Contrast(image, amount)` | Contrast enhancement |
+| `Brightness(image, amount)` | Brightness enhancement |
+| `Rotate(image, amount)` | Rotates image by degrees |
+| `Crop(image, left, top, right, bottom)` | Safe crop with boundary clamping |
+| `zoom(image, amount)` | Center-crop zoom, resized back to original dimensions |
+| `Text(image)` | Overlays sample text (work in progress) |
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Python 3.8+
+- Pillow
+
+```bash
+pip install Pillow
+```
+
+### Run the App
+
+```bash
+python Gui.py
+```
+
+---
+
+## 🖥️ How to Use
+
+1. Launch the app — the **Image X** home screen appears.
+2. Click **Import Photo** and select a `.jpg`, `.jpeg`, `.png`, or `.gif` file.
+3. The **Editor** window opens with a live preview of your image.
+4. Use the **sliders** on the left and right panels to adjust the image in real time:
+   - Left panel: Brightness · Contrast · Sharpness · Blur
+   - Right panel: Rotate · Zoom · ▶ Crop (click to expand)
+5. In the **Crop** section, drag the Left / Top / Right / Bottom sliders to define the crop region.
+6. Click **Save** to export the result — choose filename and format (JPG or PNG).
+7. Click **← Go Back** to return to the home screen.
+
+> ⚠️ If you close the editor without saving, you will be asked to confirm.
+
+---
+
+## 📦 Dependencies
+
+| Package | Purpose |
+|---|---|
+| `tkinter` | GUI framework (built into Python) |
+| `Pillow` | Image loading, processing, and display |
+
+---
+
+## 🛠️ Built With
+
+- **Python** — Core language
+- **Tkinter** — Desktop GUI
+- **Pillow (PIL)** — Image manipulation
+
+---
+
+## 📄 License
+
+This project is open source. Feel free to fork, modify, and use it.
