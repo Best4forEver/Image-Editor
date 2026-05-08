@@ -8,15 +8,15 @@ from tkinter import ttk
 from tkinter import messagebox
 
 file_path = None  
-saved = 0
+saved = False
 def on_close(window):
-    
-     if(saved > 0):
+    if saved:
         answer = messagebox.askyesno("Warning", "You haven't saved the file.The progress will be lost.")
         if answer:
             window.destroy()
         else:
-            window.destroy()
+            return
+    window.destroy()        
 
 
 def save(image):
@@ -30,7 +30,7 @@ def save(image):
     if save_path:
         global saved
         image.save(save_path)
-        saved = 0
+        saved = False
 
 def selection():
     global file_path 
@@ -55,9 +55,12 @@ def open_editor(filepath):
     tk.Label(editor, text=f"Editing: {filepath}", fg="gray").pack(pady=10)
 
     def go_back():
-        global saved
-        on_close(editor)
-        root.deiconify()      
+        if saved:
+            answer = messagebox.askyesno("Warning", "You haven't saved. Progress will be lost.")
+            if not answer:
+                return
+        editor.destroy()
+        root.deiconify()
 
     s_file = tk.Button(editor, text="Save", command=lambda: save(result))
     s_file.pack(pady=20)
@@ -89,7 +92,9 @@ def open_editor(filepath):
     image_label.image = photo
     image_label.pack(pady=10)
 
-    editor.protocol("WM_DELETE_WINDOW",lambda: on_close(root))
+    editor.protocol("WM_DELETE_WINDOW", lambda: on_close(editor))
+    
+
     brightness  = tk.DoubleVar(value=1.0)
     contrast    = tk.DoubleVar(value=1.0)
     exposure    = tk.DoubleVar(value=1.0)
@@ -149,7 +154,7 @@ def open_editor(filepath):
         image_label.config(image=new_photo)
         image_label.image = new_photo
         if img != result:
-            saved +=1
+            saved = True
 
     l_make_slider("Brightness",   brightness,   0.1, 3.0)
     l_make_slider("Contrast",     contrast,     0.1, 3.0)
@@ -158,7 +163,7 @@ def open_editor(filepath):
     l_make_slider("Shadow",        shadow,     0.0, 3.0)
     l_make_slider("Temperature",  temperature,     0.1, 3.0)
     l_make_slider("Vibrance",     vibrance,     0.1, 3.0)
-    l_make_slider("Saturation",   saturation,     0.1, 3.0)
+    l_make_slider("Saturation",     saturation,     0.1, 3.0)
     l_make_slider("Sharpness",    sharpness,    0.1, 3.0)
     l_make_slider("Blur",         blur,         0.0, 10.0)
     r_make_slider("Rotate",       rotate,       0.0, 360)
