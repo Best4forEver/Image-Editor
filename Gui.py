@@ -1,4 +1,5 @@
 import Optimize
+import numpy as np
 import Filters
 import Image_Editor
 import os, sys
@@ -94,7 +95,7 @@ def open_editor(filepath):
 
     brightness  = tk.DoubleVar(value=1.0)
     contrast    = tk.DoubleVar(value=1.0)
-    exposure    = tk.DoubleVar(value=1.0)
+    exposure    = tk.DoubleVar(value=0.0)
     highlight   = tk.DoubleVar(value=1.0)
     shadow      = tk.DoubleVar(value=1.0)
     temperature = tk.DoubleVar(value=0.0)
@@ -121,12 +122,12 @@ def open_editor(filepath):
         tk.Label(right_panel, text=label_text, bg="#1A1A2E", fg="white").pack(pady=(8,0))
         tk.Scale(right_panel, variable=variable, from_=from_, to=to,
                  resolution=0.1, orient=tk.HORIZONTAL, bg="#1A1A2E", fg="white",
-                 troughcolor="#132E23", command=on_change).pack(fill=tk.X, padx=10)             
+                 troughcolor="#132E23", command=update_image).pack(fill=tk.X, padx=10)             
     def b_make_slider(label_text, variable, from_, to):
         tk.Label(bottom_panel, text=label_text, bg="#1A1A2E", fg="white").pack(pady=(8,0))
         tk.Scale(bottom_panel, variable=variable, from_=from_, to=to,
                  resolution=0.1, orient=tk.HORIZONTAL, bg="#1A1A2E", fg="white",
-                 troughcolor="#132E23", command=on_change).pack(fill=tk.X, padx=10)          
+                 troughcolor="#132E23", command=update_image).pack(fill=tk.X, padx=10)          
     def update_image(val=None):
         
         global saved
@@ -157,7 +158,7 @@ def open_editor(filepath):
     on_change = Optimize.debounce(root, update_image)
     l_make_slider("Brightness",   brightness,   0.1, 3.0)
     l_make_slider("Contrast",     contrast,     0.1, 3.0)
-    l_make_slider("Exposure",     exposure,     0.0, 3.0)
+    l_make_slider("Exposure",     exposure,     -2.0, 2.0)
     l_make_slider("Highlights",   highlight,     0.0, 3.0)
     l_make_slider("Shadow",        shadow,     0.0, 3.0)
     l_make_slider("Temperature",  temperature,     -50.0, 50.0)

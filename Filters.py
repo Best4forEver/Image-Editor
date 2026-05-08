@@ -1,10 +1,12 @@
 from PIL import Image, ImageFilter, ImageFont, ImageEnhance, ImageDraw, ImageOps,ImageTk
 import numpy as np
 
-def Exposure(image, value=1.0):
-    arr = np.array(image) / 255.0
-    arr = np.power(arr, 1.0 / value)
-    return Image.fromarray((np.clip(arr, 0, 1) * 255).astype(np.uint8))
+def Exposure(image, value=0.0):     # value: -1.0 to +1.0
+    image = image.convert("RGB")
+    arr   = np.array(image, dtype=np.float32)
+    arr   = arr * (2 ** value)      # -1 = half brightness, +1 = double
+    return Image.fromarray(np.clip(arr, 0, 255).astype(np.uint8))
+
 
 def Highlights(image, value=1.0):      
     arr = np.array(image, dtype=np.float64)

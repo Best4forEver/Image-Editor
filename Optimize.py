@@ -25,8 +25,7 @@ def debounce(root, callback):
 
     return handler
 
-def optimize(file,result,gets,default_v):
-    if gets.get()>default_v:
-
+def optimize(file, result, gets, default_v):
+    if abs(gets.get() - default_v) > 0.01:  # ✅ small tolerance for float precision
         return file(result, gets.get())
     return result
