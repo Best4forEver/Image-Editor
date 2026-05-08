@@ -1,5 +1,6 @@
 import Optimize
 import numpy as np
+from scrollbar import ScrollablePanel
 import Filters
 import Image_Editor
 import os, sys
@@ -45,12 +46,11 @@ def selection():
 def open_editor(filepath):
     global saved
     root.withdraw()  
-
+    
     editor = tk.Toplevel(root)
     editor.title("Image X - Editor")
     editor.resizable(True, True)
     editor.geometry("1280x720")
-
     tk.Label(editor, text=f"Editing: {filepath}", fg="gray").pack(pady=10)
 
     def go_back():
@@ -78,13 +78,13 @@ def open_editor(filepath):
     bottom_panel = tk.Frame(main_area,bg="#1A1A2E",width=200)
     bottom_panel.pack(side=tk.BOTTOM, fill=tk.Y, padx=5, pady=5)
     tk.Button(bottom_panel, text="← Go Back", command=go_back).pack(pady=10)
-    left_panel  = tk.Frame(main_area, bg="#1A1A2E", width=200)
-    left_panel.pack(side=tk.LEFT, fill=tk.Y, padx=5, pady=5)
-    right_panel = tk.Frame(main_area,bg="#1A1A2E",width=200)
-    right_panel.pack(side=tk.RIGHT, fill=tk.Y, padx=5, pady=5)
+    left_panel =  ScrollablePanel(main_area, bg="#1A1A2E", width=220)
+    left_panel.pack(side=tk.LEFT,fill=tk.Y)
+
+    right_panel =  ScrollablePanel(main_area, bg="#1A1A2E", width=220)
+    right_panel.pack(side=tk.RIGHT,fill=tk.Y)
     canvas_frame = tk.Frame(main_area, bg="#2E131E")
     canvas_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-
     
     image_label = tk.Label(canvas_frame, image=photo, bg="#2E131E")
     image_label.image = photo
@@ -113,16 +113,18 @@ def open_editor(filepath):
     zoom        = tk.IntVar(value=0)
     
     
-    def l_make_slider(label_text, variable, from_, to):
-        tk.Label(left_panel, text=label_text, bg="#1A1A2E", fg="white").pack(pady=(8,0))
-        tk.Scale(left_panel, variable=variable, from_=from_, to=to,
-                 resolution=0.1, orient=tk.HORIZONTAL, bg="#1A1A2E", fg="white",
-                 troughcolor="#132E23", command=on_change).pack(fill=tk.X, padx=10)
-    def r_make_slider(label_text, variable, from_, to):
-        tk.Label(right_panel, text=label_text, bg="#1A1A2E", fg="white").pack(pady=(8,0))
-        tk.Scale(right_panel, variable=variable, from_=from_, to=to,
-                 resolution=0.1, orient=tk.HORIZONTAL, bg="#1A1A2E", fg="white",
-                 troughcolor="#132E23", command=update_image).pack(fill=tk.X, padx=10)             
+    def l_make_slider(parent, text, variable, from_, to, resolution=0.1):
+        tk.Label(parent, text=text, fg="white", bg="#1A1A2E").pack(anchor="w", padx=10)
+        tk.Scale(parent, variable=variable, from_=from_, to=to,
+             resolution=resolution, orient=tk.HORIZONTAL,
+             bg="#1A1A2E", fg="white",
+             highlightthickness=0,command=on_change).pack(fill=tk.X, padx=10)
+    def r_make_slider(parent, text, variable, from_, to, resolution=0.1):
+        tk.Label(parent, text=text, fg="white", bg="#1A1A2E").pack(anchor="w", padx=10)
+        tk.Scale(parent, variable=variable, from_=from_, to=to,
+             resolution=resolution, orient=tk.HORIZONTAL,
+             bg="#1A1A2E", fg="white",
+             highlightthickness=0,command=update_image).pack(fill=tk.X, padx=10)            
     def b_make_slider(label_text, variable, from_, to):
         tk.Label(bottom_panel, text=label_text, bg="#1A1A2E", fg="white").pack(pady=(8,0))
         tk.Scale(bottom_panel, variable=variable, from_=from_, to=to,
@@ -156,19 +158,19 @@ def open_editor(filepath):
         if img != result:
             saved = True
     on_change = Optimize.debounce(root, update_image)
-    l_make_slider("Brightness",   brightness,   0.1, 3.0)
-    l_make_slider("Contrast",     contrast,     0.1, 3.0)
-    l_make_slider("Exposure",     exposure,     -2.0, 2.0)
-    l_make_slider("Highlights",   highlight,     0.0, 3.0)
-    l_make_slider("Shadow",        shadow,     0.0, 3.0)
-    l_make_slider("Temperature",  temperature,     -50.0, 50.0)
-    l_make_slider("Vibrance",     vibrance,     0.1, 3.0)
-    l_make_slider("Saturation",     saturation,     0.1, 3.0)
-    l_make_slider("Sharpness",    sharpness,    0.1, 3.0)
-    l_make_slider("Blur",         blur,         0.0, 10.0)
-    l_make_slider("Grain",         grain,         0.0, 10.0)
-    r_make_slider("Rotate",       rotate,       0.0, 360)
-    r_make_slider("Zoom", zoom, 0.0, 5.0)
+    l_make_slider(left_panel.inner,"Brightness",   brightness,   0.1, 3.0)
+    l_make_slider(left_panel.inner,"Contrast",     contrast,     0.1, 3.0)
+    l_make_slider(left_panel.inner,"Exposure",     exposure,     -2.0, 2.0)
+    l_make_slider(left_panel.inner,"Highlights",   highlight,     0.0, 3.0)
+    l_make_slider(left_panel.inner,"Shadow",        shadow,     0.0, 3.0)
+    l_make_slider(left_panel.inner,"Temperature",  temperature,     -50.0, 50.0)
+    l_make_slider(left_panel.inner,"Vibrance",     vibrance,     0.1, 3.0)
+    l_make_slider(left_panel.inner,"Saturation",     saturation,     0.1, 3.0)
+    l_make_slider(left_panel.inner,"Sharpness",    sharpness,    0.1, 3.0)
+    l_make_slider(left_panel.inner,"Blur",         blur,         0.0, 10.0)
+    l_make_slider(left_panel.inner,"Grain",         grain,         0.0, 10.0)
+    r_make_slider(right_panel.inner,"Rotate",       rotate,       0.0, 360)
+    r_make_slider(right_panel.inner,"Zoom", zoom, 0.0, 5.0)
     # --- Collapsible Crop Section ---
     crop_frame = tk.Frame(right_panel, bg="#1A1A2E")
 
