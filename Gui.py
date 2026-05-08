@@ -1,4 +1,4 @@
-
+import Filters
 import Image_Editor
 import os, sys
 from PIL import Image, ImageFilter, ImageFont, ImageEnhance, ImageDraw, ImageOps, ImageTk
@@ -9,11 +9,15 @@ from tkinter import messagebox
 
 file_path = None  
 saved = 0
-def on_close():
-    answer = messagebox.askyesno("Warning", "You haven't saved the file.The progress will be lost.")
-    if answer:
-        editor.destroy()
-        root.destroy()
+def on_close(window):
+    
+     if(saved > 0):
+        answer = messagebox.askyesno("Warning", "You haven't saved the file.The progress will be lost.")
+        if answer:
+            window.destroy()
+        else:
+            window.destroy()
+
 
 def save(image):
  
@@ -24,9 +28,9 @@ def save(image):
 )
 
     if save_path:
-        image.save(save_path)
         global saved
-        saved += 1
+        image.save(save_path)
+        saved = 0
 
 def selection():
     global file_path 
@@ -40,6 +44,7 @@ def selection():
         open_editor(file_path) 
 
 def open_editor(filepath):
+    global saved
     root.withdraw()  
 
     editor = tk.Toplevel(root)
@@ -50,8 +55,9 @@ def open_editor(filepath):
     tk.Label(editor, text=f"Editing: {filepath}", fg="gray").pack(pady=10)
 
     def go_back():
-        editor.destroy()
-        root.deiconify()  
+        global saved
+        on_close(editor)
+        root.deiconify()      
 
     s_file = tk.Button(editor, text="Save", command=lambda: save(result))
     s_file.pack(pady=20)
@@ -82,10 +88,17 @@ def open_editor(filepath):
     image_label = tk.Label(canvas_frame, image=photo, bg="#2E131E")
     image_label.image = photo
     image_label.pack(pady=10)
-    if saved == 0:
-        editor.protocol("WM_DELETE_WINDOW", on_close)
+
+    editor.protocol("WM_DELETE_WINDOW",lambda: on_close(root))
     brightness  = tk.DoubleVar(value=1.0)
     contrast    = tk.DoubleVar(value=1.0)
+    exposure    = tk.DoubleVar(value=1.0)
+    highlight   = tk.DoubleVar(value=1.0)
+    shadow      = tk.DoubleVar(value=1.0)
+    temperature = tk.DoubleVar(value=0.0)
+    vibrance    = tk.DoubleVar(value=1.0)
+    saturation  = tk.DoubleVar(value=1.0)
+    grain       = tk.DoubleVar(value=0.0)
     sharpness   = tk.DoubleVar(value=1.0)
     blur        = tk.DoubleVar(value=0.0)
     rotate      = tk.IntVar(value=0)
@@ -112,6 +125,7 @@ def open_editor(filepath):
                  resolution=0.1, orient=tk.HORIZONTAL, bg="#1A1A2E", fg="white",
                  troughcolor="#132E23", command=update_image).pack(fill=tk.X, padx=10) 
     def update_image(val=None):
+        global saved
         nonlocal result
         result = original.copy()
         result = Image_Editor.Crop(result,
@@ -119,6 +133,13 @@ def open_editor(filepath):
                                    crop_right.get(), crop_bottom.get())
         result = Image_Editor.Blur(result, blur.get())
         result = Image_Editor.Contrast(result, contrast.get())
+        result = Filters.Exposure(result, exposure.get())
+        result = Filters.Highlights(result, highlight.get())
+        result = Filters.Shadows(result, shadow.get())
+        result = Filters.Temperature(result, temperature.get())
+        result = Filters.Vibrance(result, vibrance.get())
+        result = Filters.Grain(result, grain.get())
+        result = Filters.Saturation(result,saturation.get())
         result = Image_Editor.Sharpness(result, sharpness.get())
         result = Image_Editor.Brightness(result, brightness.get())
         result = Image_Editor.Rotate(result, rotate.get())
@@ -127,9 +148,17 @@ def open_editor(filepath):
         new_photo = ImageTk.PhotoImage(result)
         image_label.config(image=new_photo)
         image_label.image = new_photo
+        if img != result:
+            saved +=1
 
     l_make_slider("Brightness",   brightness,   0.1, 3.0)
     l_make_slider("Contrast",     contrast,     0.1, 3.0)
+    l_make_slider("Exposure",     exposure,     0.0, 3.0)
+    l_make_slider("Highlights",   highlight,     0.0, 3.0)
+    l_make_slider("Shadow",        shadow,     0.0, 3.0)
+    l_make_slider("Temperature",  temperature,     0.1, 3.0)
+    l_make_slider("Vibrance",     vibrance,     0.1, 3.0)
+    l_make_slider("Saturation",   saturation,     0.1, 3.0)
     l_make_slider("Sharpness",    sharpness,    0.1, 3.0)
     l_make_slider("Blur",         blur,         0.0, 10.0)
     r_make_slider("Rotate",       rotate,       0.0, 360)
