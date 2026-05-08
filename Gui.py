@@ -1,3 +1,4 @@
+import Optimize
 import Filters
 import Image_Editor
 import os, sys
@@ -6,29 +7,26 @@ import tkinter as tk
 from tkinter import filedialog  
 from tkinter import ttk
 from tkinter import messagebox
-
 file_path = None  
 saved = False
 def on_close(window):
+    global saved    
     if saved:
         answer = messagebox.askyesno("Warning", "You haven't saved the file.The progress will be lost.")
         if answer:
             window.destroy()
         else:
-            return
+            return       
     window.destroy()        
 
-
 def save(image):
- 
+    global saved
+    saved = True
     save_path = filedialog.asksaveasfilename(
     title="Save Image",
     defaultextension=".jpg",
-    filetypes=[("JPEG", "*.jpg"), ("PNG", "*.png")]
-)
-
+    filetypes=[("JPEG", "*.jpg"), ("PNG", "*.png")])
     if save_path:
-        global saved
         image.save(save_path)
         saved = False
 
@@ -42,7 +40,7 @@ def selection():
 
     if file_path:  
         open_editor(file_path) 
-
+        
 def open_editor(filepath):
     global saved
     root.withdraw()  
@@ -69,7 +67,6 @@ def open_editor(filepath):
     img.thumbnail((800, 500))
     original = img.copy()
     result = None
-
     photo = ImageTk.PhotoImage(img)
     
     top_bar   = tk.Frame(editor, bg="#132E23", height=40)
@@ -113,59 +110,62 @@ def open_editor(filepath):
     crop_right  = tk.DoubleVar(value=img_w)
     crop_bottom = tk.DoubleVar(value=img_h)
     zoom        = tk.IntVar(value=0)
-
+    
+    
     def l_make_slider(label_text, variable, from_, to):
         tk.Label(left_panel, text=label_text, bg="#1A1A2E", fg="white").pack(pady=(8,0))
         tk.Scale(left_panel, variable=variable, from_=from_, to=to,
                  resolution=0.1, orient=tk.HORIZONTAL, bg="#1A1A2E", fg="white",
-                 troughcolor="#132E23", command=update_image).pack(fill=tk.X, padx=10)
+                 troughcolor="#132E23", command=on_change).pack(fill=tk.X, padx=10)
     def r_make_slider(label_text, variable, from_, to):
         tk.Label(right_panel, text=label_text, bg="#1A1A2E", fg="white").pack(pady=(8,0))
         tk.Scale(right_panel, variable=variable, from_=from_, to=to,
                  resolution=0.1, orient=tk.HORIZONTAL, bg="#1A1A2E", fg="white",
-                 troughcolor="#132E23", command=update_image).pack(fill=tk.X, padx=10)             
+                 troughcolor="#132E23", command=on_change).pack(fill=tk.X, padx=10)             
     def b_make_slider(label_text, variable, from_, to):
         tk.Label(bottom_panel, text=label_text, bg="#1A1A2E", fg="white").pack(pady=(8,0))
         tk.Scale(bottom_panel, variable=variable, from_=from_, to=to,
                  resolution=0.1, orient=tk.HORIZONTAL, bg="#1A1A2E", fg="white",
-                 troughcolor="#132E23", command=update_image).pack(fill=tk.X, padx=10) 
+                 troughcolor="#132E23", command=on_change).pack(fill=tk.X, padx=10)          
     def update_image(val=None):
+        
         global saved
         nonlocal result
         result = original.copy()
         result = Image_Editor.Crop(result,
                                    crop_left.get(), crop_top.get(),
                                    crop_right.get(), crop_bottom.get())
-        result = Image_Editor.Blur(result, blur.get())
-        result = Image_Editor.Contrast(result, contrast.get())
-        result = Filters.Exposure(result, exposure.get())
-        result = Filters.Highlights(result, highlight.get())
-        result = Filters.Shadows(result, shadow.get())
-        result = Filters.Temperature(result, temperature.get())
-        result = Filters.Vibrance(result, vibrance.get())
-        result = Filters.Grain(result, grain.get())
-        result = Filters.Saturation(result,saturation.get())
-        result = Image_Editor.Sharpness(result, sharpness.get())
-        result = Image_Editor.Brightness(result, brightness.get())
-        result = Image_Editor.Rotate(result, rotate.get())
-        result = Image_Editor.zoom(result,zoom.get())
+        result = Optimize.optimize(Image_Editor.Blur,result,blur,0.0)
+        result = Optimize.optimize(Image_Editor.Contrast,result,contrast,1.0)
+        result = Optimize.optimize(Filters.Exposure,result,exposure,1.0)
+        result = Optimize.optimize(Filters.Highlights,result,highlight,1.0)
+        result = Optimize.optimize(Filters.Shadows,result,shadow,1.0)
+        result = Optimize.optimize(Filters.Temperature,result,temperature,0.0)
+        result = Optimize.optimize(Filters.Vibrance,result,vibrance,1.0)
+        result = Optimize.optimize(Filters.Grain,result,grain,0.0)
+        result = Optimize.optimize(Filters.Saturation,result,saturation,1.0)
+        result = Optimize.optimize(Image_Editor.Sharpness,result,sharpness,1.0)
+        result = Optimize.optimize(Image_Editor.Brightness,result,brightness,1.0)
+        result = Optimize.optimize(Image_Editor.Rotate,result,rotate,0.0)
+        result = Optimize.optimize(Image_Editor.zoom,result,zoom,0.0)
         result.thumbnail((800, 500))
         new_photo = ImageTk.PhotoImage(result)
         image_label.config(image=new_photo)
         image_label.image = new_photo
         if img != result:
             saved = True
-
+    on_change = Optimize.debounce(root, update_image)
     l_make_slider("Brightness",   brightness,   0.1, 3.0)
     l_make_slider("Contrast",     contrast,     0.1, 3.0)
     l_make_slider("Exposure",     exposure,     0.0, 3.0)
     l_make_slider("Highlights",   highlight,     0.0, 3.0)
     l_make_slider("Shadow",        shadow,     0.0, 3.0)
-    l_make_slider("Temperature",  temperature,     0.1, 3.0)
+    l_make_slider("Temperature",  temperature,     -50.0, 50.0)
     l_make_slider("Vibrance",     vibrance,     0.1, 3.0)
     l_make_slider("Saturation",     saturation,     0.1, 3.0)
     l_make_slider("Sharpness",    sharpness,    0.1, 3.0)
     l_make_slider("Blur",         blur,         0.0, 10.0)
+    l_make_slider("Grain",         grain,         0.0, 10.0)
     r_make_slider("Rotate",       rotate,       0.0, 360)
     r_make_slider("Zoom", zoom, 0.0, 5.0)
     # --- Collapsible Crop Section ---
@@ -199,12 +199,13 @@ def open_editor(filepath):
     make_crop_slider("Crop Right",  crop_right,  0, img_w)
     make_crop_slider("Crop Bottom", crop_bottom, 0, img_h)
     # ----------------------------------
-    exit_btn2 = tk.Button(bottom_panel, text="Exit", font=("Arial", 9), bg="#1A1A2E", fg="white", command=go_back)
+    exit_btn2 = tk.Button(bottom_panel, text="Exit", font=("Arial", 9), bg="#1A1A2E", fg="white", command=lambda:on_close(root))
     exit_btn2.pack(pady=10)
     
 def exit_app():
+    root.quit()
     root.destroy()
-    
+    sys.exit()
 
 root = tk.Tk()
 root.title("Image X")
