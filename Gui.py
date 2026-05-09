@@ -9,7 +9,7 @@ import tkinter as tk
 from tkinter import filedialog  
 from tkinter import ttk
 from tkinter import messagebox
-file_path = None  
+file_path = None 
 saved = False
 def on_close(window):
     global saved    
@@ -44,6 +44,7 @@ def selection():
         open_editor(file_path) 
         
 def open_editor(filepath):
+
     global saved
     root.withdraw()  
     
@@ -78,10 +79,10 @@ def open_editor(filepath):
     bottom_panel = tk.Frame(main_area,bg="#1A1A2E",width=200)
     bottom_panel.pack(side=tk.BOTTOM, fill=tk.Y, padx=5, pady=5)
     tk.Button(bottom_panel, text="← Go Back", command=go_back).pack(pady=10)
-    left_panel =  ScrollablePanel(main_area, bg="#1A1A2E", width=220)
+    left_panel =  ScrollablePanel(main_area, bg="#1A1A2E", width=200)
     left_panel.pack(side=tk.LEFT,fill=tk.Y)
 
-    right_panel =  ScrollablePanel(main_area, bg="#1A1A2E", width=220)
+    right_panel =  ScrollablePanel(main_area, bg="#1A1A2E", width=200)
     right_panel.pack(side=tk.RIGHT,fill=tk.Y)
     canvas_frame = tk.Frame(main_area, bg="#2E131E")
     canvas_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
@@ -151,7 +152,6 @@ def open_editor(filepath):
         result = Optimize.optimize(Image_Editor.Brightness,result,brightness,1.0)
         result = Optimize.optimize(Image_Editor.Rotate,result,rotate,0.0)
         result = Optimize.optimize(Image_Editor.zoom,result,zoom,0.0)
-        result.thumbnail((800, 500))
         new_photo = ImageTk.PhotoImage(result)
         image_label.config(image=new_photo)
         image_label.image = new_photo
@@ -172,7 +172,7 @@ def open_editor(filepath):
     r_make_slider(right_panel.inner,"Rotate",       rotate,       0.0, 360)
     r_make_slider(right_panel.inner,"Zoom", zoom, 0.0, 5.0)
     # --- Collapsible Crop Section ---
-    crop_frame = tk.Frame(right_panel, bg="#1A1A2E")
+    crop_frame = tk.Frame(right_panel.inner, bg="#1A1A2E")
 
     def toggle_crop():
         if crop_frame.winfo_ismapped():
@@ -181,9 +181,9 @@ def open_editor(filepath):
         else:
             crop_frame.pack(fill=tk.X, padx=5)
             crop_toggle_btn.config(text="▼ Crop")
-
+    
     crop_toggle_btn = tk.Button(
-        right_panel, text="▶ Crop",
+        right_panel.inner, text="▶ Crop",
         command=toggle_crop,
         bg="#132E23", fg="white",
         relief=tk.FLAT, anchor="w",
