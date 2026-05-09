@@ -44,7 +44,6 @@ def selection():
         open_editor(file_path) 
         
 def open_editor(filepath):
-
     global saved
     root.withdraw()  
     
@@ -68,10 +67,17 @@ def open_editor(filepath):
     img = Image.open(filepath)
     img.thumbnail((800, 500))
     original = img.copy()
+    history = [{
+    "image": original.copy(),
+    "brightness": 1.0,
+    "contrast": 1.0,
+    "blur": 0.0,
+    "rotate": 0}]
+    history_index = 0
     result = None
     photo = ImageTk.PhotoImage(img)
     
-    top_bar   = tk.Frame(editor, bg="#132E23", height=40)
+    top_bar   = tk.Frame(editor, bg="#132E23", height=20)
     top_bar.pack(fill=tk.X)
 
     main_area = tk.Frame(editor, bg="#2E131E")
@@ -112,8 +118,62 @@ def open_editor(filepath):
     crop_right  = tk.DoubleVar(value=img_w)
     crop_bottom = tk.DoubleVar(value=img_h)
     zoom        = tk.IntVar(value=0)
+    def saved_history():
+        nonlocal history_index
+
+        history[:] = history[:history_index + 1]
+
+        history.append({
+        "image": result.copy(),
+        "brightness": brightness.get(),
+        "contrast": contrast.get(),
+        "blur": blur.get(),
+        "rotate": rotate.get(),
+        })
+        history_index += 1
+
+    def undo():
+        nonlocal history_index, result
+
+        if history_index > 0:
+            history_index -= 1
+
+        state = history[history_index]
+
+        result = state["image"].copy()
+
+        brightness.set(state["brightness"])
+        contrast.set(state["contrast"])
+        blur.set(state["blur"])
+        rotate.set(state["rotate"])
+
+        show_image(result)
+        
+                
+    def redo():
+
+        nonlocal history_index, result
+
+        if history_index < len(history) - 1:
+            history_index += 1
+
+        state = history[history_index]
+
+        result = state["image"].copy()
+
+        brightness.set(state["brightness"])
+        contrast.set(state["contrast"])
+        blur.set(state["blur"])
+        rotate.set(state["rotate"])
+
+        show_image(result)   
+    def show_image(result):
+        preview = result.copy()
+        preview.thumbnail((800,500))
+        new_photo = ImageTk.PhotoImage(preview)
     
-    
+        image_label.config(image=new_photo)
+        image_label.image = new_photo               
     def l_make_slider(parent, text, variable, from_, to, resolution=0.1):
         tk.Label(parent, text=text, fg="white", bg="#1A1A2E").pack(anchor="w", padx=10)
         tk.Scale(parent, variable=variable, from_=from_, to=to,
@@ -132,7 +192,7 @@ def open_editor(filepath):
                  resolution=0.1, orient=tk.HORIZONTAL, bg="#1A1A2E", fg="white",
                  troughcolor="#132E23", command=update_image).pack(fill=tk.X, padx=10)          
     def update_image(val=None):
-        
+        nonlocal history,history_index
         global saved
         nonlocal result
         result = original.copy()
@@ -152,12 +212,13 @@ def open_editor(filepath):
         result = Optimize.optimize(Image_Editor.Brightness,result,brightness,1.0)
         result = Optimize.optimize(Image_Editor.Rotate,result,rotate,0.0)
         result = Optimize.optimize(Image_Editor.zoom,result,zoom,0.0)
-        new_photo = ImageTk.PhotoImage(result)
-        image_label.config(image=new_photo)
-        image_label.image = new_photo
+        
+        show_image(result)
         if img != result:
             saved = True
-    on_change = Optimize.debounce(root, update_image)
+
+    on_change = Optimize.debounce(root, lambda v=None: [update_image(), saved_history()])
+
     l_make_slider(left_panel.inner,"Brightness",   brightness,   0.1, 3.0)
     l_make_slider(left_panel.inner,"Contrast",     contrast,     0.1, 3.0)
     l_make_slider(left_panel.inner,"Exposure",     exposure,     -2.0, 2.0)
@@ -181,7 +242,10 @@ def open_editor(filepath):
         else:
             crop_frame.pack(fill=tk.X, padx=5)
             crop_toggle_btn.config(text="▼ Crop")
-    
+    undobtn = tk.Button(bottom_panel,text="↶",font=("Arial",9),bg="#1A1A2E", fg="white", command=undo)
+    redobtn = tk.Button(bottom_panel,text="↷",font=("Arial",9),bg="#1A1A2E", fg="white", command=redo)
+    undobtn.pack(pady=10)
+    redobtn.pack(pady=10)
     crop_toggle_btn = tk.Button(
         right_panel.inner, text="▶ Crop",
         command=toggle_crop,
