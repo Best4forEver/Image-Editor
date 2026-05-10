@@ -67,12 +67,27 @@ def open_editor(filepath):
     img = Image.open(filepath)
     img.thumbnail((800, 500))
     original = img.copy()
+    img_w, img_h = original.size
     history = [{
-    "image": original.copy(),
-    "brightness": 1.0,
-    "contrast": 1.0,
-    "blur": 0.0,
-    "rotate": 0}]
+        "image": original.copy(),
+        "brightness": 1.0,
+        "contrast": 1.0,
+        "blur": 0.0,
+        "rotate": 0,
+        "exposure": 0.0,
+        "highlight": 1.0,
+        "vibrance": 1.0,
+        "grain": 0.0,
+        "saturation": 1.0,
+        "shadow": 1.0,
+        "sharpness": 1.0,
+        "temperature": 0.0,
+        "zoom":0,
+        "crop_left":0,
+        "crop_right":img_w,
+        "crop_top":0,
+        "crop_bottom":img_h,
+        }]
     history_index = 0
     result = None
     photo = ImageTk.PhotoImage(img)
@@ -112,12 +127,36 @@ def open_editor(filepath):
     sharpness   = tk.DoubleVar(value=1.0)
     blur        = tk.DoubleVar(value=0.0)
     rotate      = tk.IntVar(value=0)
-    img_w, img_h = original.size
     crop_left   = tk.DoubleVar(value=0)
     crop_top    = tk.DoubleVar(value=0)
     crop_right  = tk.DoubleVar(value=img_w)
     crop_bottom = tk.DoubleVar(value=img_h)
     zoom        = tk.IntVar(value=0)
+    def load_state(state):
+        nonlocal result
+
+        result = state["image"].copy()
+
+        brightness.set(state["brightness"])
+        contrast.set(state["contrast"])
+        blur.set(state["blur"])
+        rotate.set(state["rotate"])
+        exposure.set(state["exposure"])
+        highlight.set(state["highlight"])
+        shadow.set(state["shadow"])
+        temperature.set(state["temperature"])
+        vibrance.set(state["vibrance"])
+        saturation.set(state["saturation"])
+        grain.set(state["grain"])
+        sharpness.set(state["sharpness"])
+        zoom.set(state["zoom"])
+
+        crop_left.set(state["crop_left"])
+        crop_top.set(state["crop_top"])
+        crop_right.set(state["crop_right"])
+        crop_bottom.set(state["crop_bottom"])
+
+        show_image(result)
     def saved_history():
         nonlocal history_index
 
@@ -129,44 +168,38 @@ def open_editor(filepath):
         "contrast": contrast.get(),
         "blur": blur.get(),
         "rotate": rotate.get(),
+        "exposure": exposure.get(),
+        "highlight": highlight.get(),
+        "shadow": shadow.get(),
+        "temperature": temperature.get(),
+        "vibrance": vibrance.get(),
+        "saturation": saturation.get(),
+        "grain": grain.get(),
+        "sharpness": sharpness.get(),
+        "zoom": zoom.get(),
+        "crop_left":crop_left.get(),
+        "crop_top": crop_top.get(),
+        "crop_right": crop_right.get(),
+        "crop_bottom" : crop_bottom.get(),
         })
         history_index += 1
 
     def undo():
-        nonlocal history_index, result
+        nonlocal history_index
 
         if history_index > 0:
             history_index -= 1
+        load_state(history[history_index])
 
-        state = history[history_index]
-
-        result = state["image"].copy()
-
-        brightness.set(state["brightness"])
-        contrast.set(state["contrast"])
-        blur.set(state["blur"])
-        rotate.set(state["rotate"])
-
-        show_image(result)
-        
                 
     def redo():
 
-        nonlocal history_index, result
+        nonlocal history_index
 
         if history_index < len(history) - 1:
             history_index += 1
 
-        state = history[history_index]
-
-        result = state["image"].copy()
-
-        brightness.set(state["brightness"])
-        contrast.set(state["contrast"])
-        blur.set(state["blur"])
-        rotate.set(state["rotate"])
-
-        show_image(result)   
+        load_state(history[history_index])
     def show_image(result):
         preview = result.copy()
         preview.thumbnail((800,500))
@@ -242,6 +275,9 @@ def open_editor(filepath):
         else:
             crop_frame.pack(fill=tk.X, padx=5)
             crop_toggle_btn.config(text="▼ Crop")
+    editor.bind("<Control-z>",lambda e:undo()) 
+    editor.bind("<Control-y>",lambda e:redo()) 
+    editor.bind("<Control-s>",lambda e:save(result))      
     undobtn = tk.Button(bottom_panel,text="↶",font=("Arial",9),bg="#1A1A2E", fg="white", command=undo)
     redobtn = tk.Button(bottom_panel,text="↷",font=("Arial",9),bg="#1A1A2E", fg="white", command=redo)
     undobtn.pack(pady=10)
