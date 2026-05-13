@@ -92,10 +92,6 @@ Feel free to fork the repository and improve the project.
 [View Demo Video](assets/gitvideo.mp4)
 
 
-## 📄 License
-
-This project is open source and available under the MIT License.
-
 ## 👨‍💻 Author
 
 Made by Umer Hussain
