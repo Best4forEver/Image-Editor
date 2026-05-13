@@ -1,74 +1,102 @@
-# 🖼️ Image X — Simple Image Editor
+# 🖼️ Image Editor
 
-A lightweight desktop image editor built with **Python**, **Tkinter**, and **Pillow (PIL)**. Open any photo and apply real-time adjustments using intuitive sliders — no installation beyond Python required.
-
----
+A desktop-based Image Editor built with Python, Tkinter, and Pillow.  
+This project provides a clean GUI for applying filters, adjustments, and image manipulations in real time.
 
 ## ✨ Features
 
-| Feature | Description |
-|---|---|
-| 🔆 **Brightness** | Lighten or darken your image (0.1× – 3.0×) |
-| 🎨 **Contrast** | Boost or reduce contrast (0.1× – 3.0×) |
-| ✏️ **Sharpness** | Make details crisp or soft (0.1× – 3.0×) |
-| 🌫️ **Blur** | Apply Gaussian blur (0 – 10 radius) |
-| 🔄 **Rotate** | Rotate the image 0–360 degrees |
-| 🔍 **Zoom** | Zoom into the center of the image |
-| ✂️ **Crop** | Interactively crop by Left / Top / Right / Bottom (collapsible panel) |
-| 💾 **Save** | Export edited image as `.jpg` or `.png` |
-| ⚠️ **Unsaved warning** | Prompts before closing if image hasn't been saved |
+- 📂 Open and Save Images
+- 🎨 Apply Filters
+- 🌗 Brightness Adjustment
+- 🌫️ Blur Effects
+- ✨ Sharpness Control
+- 🔄 Real-Time Image Preview
+- 🖱️ Interactive GUI
+- 📜 Scrollable Editing Panel
+- ⚡ Optimized Image Processing
 
----
+## 🛠️ Technologies Used
+
+- Python
+- Tkinter
+- CustomTkinter
+- Pillow (PIL)
+- NumPy
+
+## 📸 Preview
+
+_Add screenshots of your editor here_
+
+```bash
+assets/
+├── preview1.png
+├── preview2.png
+```
+
+## 📦 Installation
+
+Clone the repository:
+
+```bash
+git clone https://github.com/Best4forEver/Image-Editor.git
+cd Image-Editor
+```
+
+Install dependencies:
+
+```bash
+pip install pillow customtkinter numpy
+```
+
+Run the project:
+
+```bash
+python main.py
+```
 
 ## 📁 Project Structure
 
-```
-Simple Image Editor/
-│
-├── Gui.py              # Main application — Tkinter GUI and editor window
-├── Image_Editor.py     # Backend image processing functions (Pillow)
-├── logo.ico            # App icon
-└── README.md
-```
-
----
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- Python 3.8+
-- Pillow
-
 ```bash
-pip install Pillow
+Image-Editor/
+│── main.py
+│── Image_Editor.py
+│── Filters.py
+│── Optimize.py
+│── scrollbar.py
+│── assets/
 ```
 
-### Run the App
+## 🚀 Future Improvements
 
-```bash
-python Gui.py
-```
+- Layer Support
+- Undo / Redo System
+- Crop Tool
+- Drawing Tool
+- Export Quality Settings
 
----
+## 💡 What I Learned
 
-## 📦 Dependencies
+This project helped improve my understanding of:
 
-| Package | Purpose |
-|---|---|
-| `tkinter` | GUI framework (built into Python) |
-| `Pillow` | Image loading, processing, and display |
+- GUI Development
+- Event-Driven Programming
+- Image Processing
+- Optimization Techniques
 
----
+## 🤝 Contributing
 
-## 🛠️ Built With
+Pull requests are welcome.  
+Feel free to fork the repository and improve the project.
 
-- **Python** — Core language
-- **Tkinter** — Desktop GUI
-- **Pillow (PIL)** — Image manipulation
+## 📺 DEMO video
+[View Demo Video](assets/gitvideo.mp4)
 
----
 
 ## 📄 License
 
-This project is open source. Feel free to fork, modify, and use it.
+This project is open source and available under the MIT License.
+
+## 👨‍💻 Author
+
+Made by Umer Hussain
+
